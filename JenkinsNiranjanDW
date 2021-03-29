@@ -1,0 +1,66 @@
+pipeline{
+    agent any;
+    tools{
+        maven 'maven3.6.3'
+    }
+  options{
+        timestamps()
+        
+    }
+    stages{
+
+        stage('CheckoutCode'){
+            steps{
+
+     git branch: 'development', credentialsId: 'd85ddaa4-7a61-4e6b-b13b-2e1ff5b9d908',url: 'https://github.com/niranjan7/maven-web-application.git'
+
+        }
+        }
+         stage('Build'){
+             steps{
+                 sh "mvn clean package"
+             }
+
+
+         }
+         stage('ExecuteSonarQubeReport'){
+             steps{
+                 sh "mvn sonar:sonar"
+             }
+         }
+         stage('UploadToNexus'){
+             steps{
+                 sh "mvn deploy"
+             }
+         }
+         stage('DeployAppIntoTomcatSerer'){
+             steps{
+                 sshagent(['1c3f41a0-7b5f-45bc-b724-b8dd295402c7']) {
+               sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@52.66.163.62:/opt/apache-tomcat-9.0.41/webapps/"
+               }
+             }
+         }
+         
+         
+    }
+    post{
+
+             success{
+                mail body: '''Build over...success
+
+                Regards
+                Niranjan Reddy
+                9642546783''', subject: 'Build Over....success', to: 'thummalaniranjan@gmail.com'
+             }
+             failure{
+                 
+                 mail body: '''Build over...failed
+
+                Regards
+                Niranjan Reddy
+                9642546783''', subject: 'Build Over....failed', to: 'thummalaniranjan@gmail.com'
+
+             }
+             
+         }
+}
