@@ -15,6 +15,7 @@ node
 			  {
 			  sh "${mavenHome}/bin/mvn clean package"
 			  }
+			  /*
 			  stage('ExecuteSonarQubeReport')
 			  {
 			  sh "${mavenHome}/bin/mvn sonar:sonar"
@@ -37,4 +38,5 @@ node
                 Niranjan Reddy
                 9642546783''', subject: 'Build Over', to: 'thummalaniranjan@gmail.com'
 			  }
+			  */
 			  }
